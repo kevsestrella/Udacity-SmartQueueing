@@ -59,7 +59,7 @@ class PersonDetect:
         self.model_structure=model_name+'.xml'
         self.device=device
         self.threshold=threshold
-
+        
         try:
             self.model=IENetwork(self.model_structure, self.model_weights)
         except Exception as e:
@@ -82,13 +82,13 @@ class PersonDetect:
             print(f"Unsupported layers: {unsupported_layers}")
             exit(1)
             
-        self.exec_network = self.plugin.load_network(self.model, device)
+        self.exec_network = self.plugin.load_network(self.model, self.device)
         
         return
     
     def predict(self, image):
         raw_image = image
-        image = preprocess_input(image)
+        image = self.preprocess_input(image)
         self.exec_network.start_async(request_id=0, inputs={self.input_name:image})
         coords = self.exec_network.requests[0].outputs[self.output_blob]
         coords, image =  self.draw_outputs(coords, raw_image)
@@ -102,10 +102,11 @@ class PersonDetect:
         return coords, frame
 
     def preprocess_outputs(self, outputs):
-    '''
-    TODO: This method needs to be completed by you
-    '''
-        raise NotImplementedError
+        '''
+        TODO: This method needs to be completed by you
+        '''
+        # raise NotImplementedError
+        
         
         
     def preprocess_input(self, image):
