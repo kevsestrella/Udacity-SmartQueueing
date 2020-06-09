@@ -20,7 +20,7 @@ if echo "$DEVICE" | grep -q "FPGA"; then # if device passed in is FPGA, load bit
 
     export CL_CONTEXT_COMPILER_MODE_INTELFPGA=3
 fi
-
+ 
 python3 person_detect.py  --model ${MODEL} \
                           --device ${DEVICE} \
                           --video ${VIDEO} \
