@@ -72,15 +72,6 @@ class PersonDetect:
 
     def load_model(self):
         self.plugin = IECore()
-        
-        if self.device == "CPU":
-            pass
-        
-        supported_layers = self.plugin.query_network(network=self.model, device_name=self.device)
-        unsupported_layers = [l for l in self.model.layers.keys() if l not in supported_layers]
-        if len(unsupported_layers):
-            print(f"Unsupported layers: {unsupported_layers}")
-            exit(1)
             
         self.exec_network = self.plugin.load_network(self.model, self.device)
         
@@ -90,13 +81,14 @@ class PersonDetect:
         raw_image = image
         image = self.preprocess_input(image)
         self.exec_network.start_async(request_id=0, inputs={self.input_name:image})
-        coords = self.exec_network.requests[0].outputs[self.output_blob]
-        coords, image =  self.draw_outputs(coords, raw_image)
-        return coords, image
+        if self.exec_network.requests[0].wait(-1) == 0:
+            coords = self.exec_network.requests[0].outputs[self.output_name]
+            coords, image =  self.draw_outputs(coords, raw_image)
+            return coords, image
     
     def draw_outputs(self, coords, image):
    
-        height, width, channels = img.shape 
+        height, width, channels = image.shape 
         coords, frame = draw_boxes(image, coords, width, height)
         
         return coords, frame
